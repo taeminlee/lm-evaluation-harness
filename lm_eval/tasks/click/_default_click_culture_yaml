@@ -1,0 +1,4 @@
+group: 
+  - click
+  - click_culture
+include: _default_click_yaml

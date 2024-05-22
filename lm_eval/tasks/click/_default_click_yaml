@@ -1,0 +1,31 @@
+dataset_path: taeminlee/CLIcK
+test_split: test
+fewshot_split: test
+output_type: multiple_choice
+process_docs: !function utils.process_docs
+doc_to_text: "{% if paragraph and paragraph|length >= 5 %}
+주어진 맥락을 천천히 읽고, 질문에 대한 적절한 정답을 A, B, C, D중에 골라 알파벳 하나로 답하시오.\n
+(Read the given context, and choose the correct answer to the question from options A, B, C, or D. Respond with a single alphabet.)\n
+{% else %}
+주어진 질문을 천천히 읽고, 질문에 대한 적절한 정답을 A, B, C, D중에 골라 알파벳 하나로 답하시오.\n
+(Read the given Question, and choose the correct answer from options A, B, C, or D. Respond with a single alphabet.)\n
+{% endif %}
+{% if paragraph and paragraph|length >= 5 %}맥락(Context): {{paragraph}}\n{% endif %}
+질문(Question): {{question}}\n
+보기(Options):
+{% set alphabets = ['A', 'B', 'C', 'D', 'E'] %}
+ {% for choice in choices %}
+    {{ alphabets[loop.index0] }}: {{ choice }}
+{% endfor %}\n
+정답(Answer): "
+doc_to_choice: "{{labels}}"
+doc_to_target: "{{label}}"
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc_norm
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0
