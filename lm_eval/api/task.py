@@ -373,6 +373,7 @@ class Task(abc.ABC):
         world_size=None,
         cache_requests=False,
         rewrite_requests_cache=False,
+        lm=None
     ) -> None:
         """Build a set of Instances for a task, and store them in task.instances"""
 
@@ -413,6 +414,10 @@ class Task(abc.ABC):
 
         num_docs = len(doc_id_docs)
 
+        from auto_chat_template import AutoChatTokenizer
+
+        act = AutoChatTokenizer(lm.model_args['model'])
+
         for doc_id, doc in tqdm(
             doc_id_docs,
             total=num_docs,
@@ -422,6 +427,8 @@ class Task(abc.ABC):
                 doc,
                 0 if self.config.num_fewshot is None else self.config.num_fewshot,
             )
+
+            fewshot_ctx = act.prompt(fewshot_ctx)
 
             # TODO: we should override self.config.repeats if doing greedy gen so users don't waste time+compute
             inst = self.construct_requests(
